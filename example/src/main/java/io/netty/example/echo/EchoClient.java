@@ -73,6 +73,8 @@ public final class EchoClient {
             // Start the client.
             ChannelFuture f = b.connect(HOST, PORT).sync();
 
+            f.channel().writeAndFlush("Fuck Netty");
+
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
         } finally {

@@ -27,6 +27,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        System.out.println(msg);
         ctx.write(msg);
     }
 
@@ -38,7 +39,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         // Close the connection when an exception is raised.
-        cause.printStackTrace();
+        //cause.printStackTrace();
         ctx.close();
     }
 }
