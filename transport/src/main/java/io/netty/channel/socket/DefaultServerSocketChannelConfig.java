@@ -34,6 +34,7 @@ import static io.netty.channel.ChannelOption.SO_REUSEADDR;
 
 /**
  * The default {@link ServerSocketChannelConfig} implementation.
+ * 很重要的类，
  */
 public class DefaultServerSocketChannelConfig extends DefaultChannelConfig
                                               implements ServerSocketChannelConfig {

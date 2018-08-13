@@ -51,8 +51,10 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     @SuppressWarnings("deprecation")
     private volatile ChannelFactory<? extends C> channelFactory;
     private volatile SocketAddress localAddress;
+    //操作
     private final Map<ChannelOption<?>, Object> options = new LinkedHashMap<ChannelOption<?>, Object>();
     private final Map<AttributeKey<?>, Object> attrs = new LinkedHashMap<AttributeKey<?>, Object>();
+    //人request的请求处理器
     private volatile ChannelHandler handler;
 
     AbstractBootstrap() {
@@ -246,7 +248,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     /**
-     * Create a new {@link Channel} and bind it.
+     * Create a new {@link Channel} and bind it.创建一个Channel并绑定对应的端口和IP
      */
     public ChannelFuture bind(int inetPort) {
         return bind(new InetSocketAddress(inetPort));
@@ -267,18 +269,18 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     /**
-     * Create a new {@link Channel} and bind it.
+     * Create a new {@link Channel} and bind it.  创建一个Channel并绑定SocketAddress
      */
     public ChannelFuture bind(SocketAddress localAddress) {
         validate();
         if (localAddress == null) {
             throw new NullPointerException("localAddress");
         }
-        return doBind(localAddress);
+        return doBind(localAddress);//绑定IP和端口
     }
-
+   //绑定
     private ChannelFuture doBind(final SocketAddress localAddress) {
-        final ChannelFuture regFuture = initAndRegister();
+        final ChannelFuture regFuture = initAndRegister();//初始化和注册
         final Channel channel = regFuture.channel();
         if (regFuture.cause() != null) {
             return regFuture;
@@ -312,11 +314,11 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             return promise;
         }
     }
-
+    //初始化Channel和注册Channel
     final ChannelFuture initAndRegister() {
         Channel channel = null;
-        try {
-            channel = channelFactory.newChannel();
+        try {//NioServerSocketChannel
+            channel = channelFactory.newChannel();//从Channel工厂中获取一个Channel
             init(channel);
         } catch (Throwable t) {
             if (channel != null) {
@@ -327,7 +329,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
             return new DefaultChannelPromise(channel, GlobalEventExecutor.INSTANCE).setFailure(t);
         }
 
-        ChannelFuture regFuture = config().group().register(channel);
+        ChannelFuture regFuture = config().group().register(channel);//注册Channel
         if (regFuture.cause() != null) {
             if (channel.isRegistered()) {
                 channel.close();
@@ -349,7 +351,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     abstract void init(Channel channel) throws Exception;
-
+    //bind 操作
     private static void doBind0(
             final ChannelFuture regFuture, final Channel channel,
             final SocketAddress localAddress, final ChannelPromise promise) {
@@ -369,7 +371,7 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     }
 
     /**
-     * the {@link ChannelHandler} to use for serving the requests.
+     * 处理request请求的处理器，实例必须是ChannelHandler的子类
      */
     @SuppressWarnings("unchecked")
     public B handler(ChannelHandler handler) {

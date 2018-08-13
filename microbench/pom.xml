@@ -117,21 +117,21 @@
           </excludes>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <testSourceDirectory>${project.build.sourceDirectory}</testSourceDirectory>
-          <testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>
-          <excludes>
-            <exclude>**/AbstractMicrobenchmark.java</exclude>
-            <exclude>**/*$*.class</exclude>
-            <exclude>**/generated/*.class</exclude>
-          </excludes>
-          <systemPropertyVariables>
-            <perfReportDir>${project.build.directory}/reports/performance/</perfReportDir>
-          </systemPropertyVariables>
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<artifactId>maven-surefire-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<testSourceDirectory>${project.build.sourceDirectory}</testSourceDirectory>-->
+          <!--<testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>-->
+          <!--<excludes>-->
+            <!--<exclude>**/AbstractMicrobenchmark.java</exclude>-->
+            <!--<exclude>**/*$*.class</exclude>-->
+            <!--<exclude>**/generated/*.class</exclude>-->
+          <!--</excludes>-->
+          <!--<systemPropertyVariables>-->
+            <!--<perfReportDir>${project.build.directory}/reports/performance/</perfReportDir>-->
+          <!--</systemPropertyVariables>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>

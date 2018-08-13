@@ -151,6 +151,7 @@ public abstract class Recycler<T> {
         DefaultHandle<T> handle = stack.pop();
         if (handle == null) {
             handle = stack.newHandle();
+            //newObject方法需要子类实现
             handle.value = newObject(handle);
         }
         return (T) handle.value;

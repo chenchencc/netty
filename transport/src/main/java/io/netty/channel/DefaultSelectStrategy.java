@@ -19,12 +19,14 @@ import io.netty.util.IntSupplier;
 
 /**
  * Default select strategy.
+ * 选择策略
  */
 final class DefaultSelectStrategy implements SelectStrategy {
     static final SelectStrategy INSTANCE = new DefaultSelectStrategy();
 
     private DefaultSelectStrategy() { }
 
+    //选择策略，如果有任务的话就立即返回，没有的话就返回一个等待任务的状态
     @Override
     public int calculateStrategy(IntSupplier selectSupplier, boolean hasTasks) throws Exception {
         return hasTasks ? selectSupplier.get() : SelectStrategy.SELECT;

@@ -40,6 +40,7 @@ import java.util.concurrent.RejectedExecutionException;
 /**
  * The default {@link ChannelPipeline} implementation.  It is usually created
  * by a {@link Channel} implementation when the {@link Channel} is created.
+ * ChannelPipeline接口的默认实现类
  */
 public class DefaultChannelPipeline implements ChannelPipeline {
 
@@ -56,8 +57,8 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         }
     };
 
-    final AbstractChannelHandlerContext head;
-    final AbstractChannelHandlerContext tail;
+    final AbstractChannelHandlerContext head;//头
+    final AbstractChannelHandlerContext tail;//尾
 
     private final Channel channel;
     private final ChannelFuture succeededFuture;
@@ -106,7 +107,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
     final Object touch(Object msg, AbstractChannelHandlerContext next) {
         return touch ? ReferenceCountUtil.touch(msg, next) : msg;
     }
-
+    //根据handler创建一个HandlerContext
     private AbstractChannelHandlerContext newContext(EventExecutorGroup group, String name, ChannelHandler handler) {
         return new DefaultChannelHandlerContext(this, childExecutor(group), name, handler);
     }
@@ -198,8 +199,10 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         synchronized (this) {
             checkMultiplicity(handler);
 
+            //为handler创建一个HandlerContext，直接new一个DefaultChannelHandlerContext实例
             newCtx = newContext(group, filterName(name, handler), handler);
 
+            //核心的方法
             addLast0(newCtx);
 
             // If the registered is false it means that the channel was not registered on an eventloop yet.
@@ -226,7 +229,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         callHandlerAdded0(newCtx);
         return this;
     }
-
+    //添加到链表中
     private void addLast0(AbstractChannelHandlerContext newCtx) {
         AbstractChannelHandlerContext prev = tail.prev;
         newCtx.prev = prev;
@@ -373,7 +376,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
 
         return this;
     }
-
+    //给Channel添加handler
     @Override
     public final ChannelPipeline addLast(ChannelHandler... handlers) {
         return addLast(null, handlers);
@@ -815,6 +818,7 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         return buf.toString();
     }
 
+    //调用ChannelHandlerContext中的invokeChannelRegistered方法
     @Override
     public final ChannelPipeline fireChannelRegistered() {
         AbstractChannelHandlerContext.invokeChannelRegistered(head);
@@ -1225,6 +1229,9 @@ public class DefaultChannelPipeline implements ChannelPipeline {
         public void channelReadComplete(ChannelHandlerContext ctx) throws Exception { }
     }
 
+    /**
+     * 只有HeadContext持有了Unsafe，TailContext不持有Unsafe的引用
+     */
     final class HeadContext extends AbstractChannelHandlerContext
             implements ChannelOutboundHandler, ChannelInboundHandler {
 

@@ -40,7 +40,7 @@ final class PlatformDependent0 {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(PlatformDependent0.class);
     static final Unsafe UNSAFE;
-    private static final long ADDRESS_FIELD_OFFSET;
+    private static final long ADDRESS_FIELD_OFFSET;//地址位移偏移量
     private static final long BYTE_ARRAY_BASE_OFFSET;
     private static final Constructor<?> DIRECT_BUFFER_CONSTRUCTOR;
 
@@ -58,7 +58,7 @@ final class PlatformDependent0 {
     private static final boolean UNALIGNED;
 
     static {
-        final ByteBuffer direct = ByteBuffer.allocateDirect(1);
+        final ByteBuffer direct = ByteBuffer.allocateDirect(1);//利用JDK创建一个直接内存
         final Field addressField;
         // attempt to access field Buffer#address
         final Object maybeAddressField = AccessController.doPrivileged(new PrivilegedAction<Object>() {
@@ -283,15 +283,21 @@ final class PlatformDependent0 {
         return newDirectBuffer(UNSAFE.reallocateMemory(directBufferAddress(buffer), capacity), capacity);
     }
 
+    /**
+     * 通过Unsafe类来进行内存的分配，其实和JDK的ByteBuffer分配的方式有点相同，UNSAFE.allocateMemory(capacity)根据capacity大小在堆外内存分配一段内存，并返回其内存偏移量
+     * @param capacity
+     * @return
+     */
     static ByteBuffer allocateDirectNoCleaner(int capacity) {
         return newDirectBuffer(UNSAFE.allocateMemory(capacity), capacity);
     }
-
+    //address是内存分配地址的偏移量
     static ByteBuffer newDirectBuffer(long address, int capacity) {
         ObjectUtil.checkPositiveOrZero(address, "address");
         ObjectUtil.checkPositiveOrZero(capacity, "capacity");
 
         try {
+            //利用Unsafe类来进行内存的分配，然后再通过内反射的方式来创建一个ByteBuffer对象
             return (ByteBuffer) DIRECT_BUFFER_CONSTRUCTOR.newInstance(address, capacity);
         } catch (Throwable cause) {
             // Not expected to ever throw!
@@ -301,7 +307,7 @@ final class PlatformDependent0 {
             throw new Error(cause);
         }
     }
-
+    //释放直接内存
     static void freeDirectBuffer(ByteBuffer buffer) {
         // Delegate to other class to not break on android
         // See https://github.com/netty/netty/issues/2604
@@ -328,6 +334,12 @@ final class PlatformDependent0 {
         return UNSAFE.getInt(object, fieldOffset);
     }
 
+    /**
+     * 内存分配使用JDK中的Unsafe来进行内存的分配
+     * @param object
+     * @param fieldOffset
+     * @return
+     */
     private static long getLong(Object object, long fieldOffset) {
         return UNSAFE.getLong(object, fieldOffset);
     }
@@ -627,6 +639,10 @@ final class PlatformDependent0 {
         return UNSAFE.allocateMemory(size);
     }
 
+    /**
+     * 调用Unsafe类释放内存
+     * @param address
+     */
     static void freeMemory(long address) {
         UNSAFE.freeMemory(address);
     }

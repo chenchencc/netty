@@ -38,6 +38,7 @@ import java.util.List;
 /**
  * A {@link io.netty.channel.socket.ServerSocketChannel} implementation which uses
  * NIO selector based implementation to accept new connections.
+ *
  */
 public class NioServerSocketChannel extends AbstractNioMessageChannel
                              implements io.netty.channel.socket.ServerSocketChannel {
@@ -46,7 +47,7 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
     private static final SelectorProvider DEFAULT_SELECTOR_PROVIDER = SelectorProvider.provider();
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(NioServerSocketChannel.class);
-
+    //获取一个
     private static ServerSocketChannel newSocket(SelectorProvider provider) {
         try {
             /**
@@ -55,7 +56,7 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
              *
              *  See <a href="https://github.com/netty/netty/issues/2308">#2308</a>.
              */
-            return provider.openServerSocketChannel();
+            return provider.openServerSocketChannel();//打开一个Channel
         } catch (IOException e) {
             throw new ChannelException(
                     "Failed to open a server socket.", e);
@@ -83,6 +84,7 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
      */
     public NioServerSocketChannel(ServerSocketChannel channel) {
         super(null, channel, SelectionKey.OP_ACCEPT);
+        //TODO很重要的点
         config = new NioServerSocketChannelConfig(this, javaChannel().socket());
     }
 
@@ -188,7 +190,7 @@ public class NioServerSocketChannel extends AbstractNioMessageChannel
     protected final Object filterOutboundMessage(Object msg) throws Exception {
         throw new UnsupportedOperationException();
     }
-
+    //很重要的类
     private final class NioServerSocketChannelConfig  extends DefaultServerSocketChannelConfig {
         private NioServerSocketChannelConfig(NioServerSocketChannel channel, ServerSocket javaSocket) {
             super(channel, javaSocket);

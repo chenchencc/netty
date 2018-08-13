@@ -44,6 +44,7 @@ import static io.netty.util.internal.ObjectUtil.checkNotNull;
 public class DefaultChannelConfig implements ChannelConfig {
     private static final MessageSizeEstimator DEFAULT_MSG_SIZE_ESTIMATOR = DefaultMessageSizeEstimator.DEFAULT;
 
+    //默认链接超时
     private static final int DEFAULT_CONNECT_TIMEOUT = 30000;
 
     private static final AtomicIntegerFieldUpdater<DefaultChannelConfig> AUTOREAD_UPDATER;
@@ -68,6 +69,7 @@ public class DefaultChannelConfig implements ChannelConfig {
 
     protected final Channel channel;
 
+    //TODO很重要的地方，分配内存
     private volatile ByteBufAllocator allocator = ByteBufAllocator.DEFAULT;
     private volatile RecvByteBufAllocator rcvBufAllocator;
     private volatile MessageSizeEstimator msgSizeEstimator = DEFAULT_MSG_SIZE_ESTIMATOR;

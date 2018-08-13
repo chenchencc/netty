@@ -22,13 +22,17 @@ import io.netty.util.Recycler.Handle;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+/**
+ * 池化的bytebuf，PooledByteBuf本身也是一种ByteBuf
+ * @param <T>
+ */
 abstract class PooledByteBuf<T> extends AbstractReferenceCountedByteBuf {
 
     private final Recycler.Handle<PooledByteBuf<T>> recyclerHandle;
 
     protected PoolChunk<T> chunk;
     protected long handle;
-    protected T memory;
+    protected T memory;//目标对象
     protected int offset;
     protected int length;
     int maxLength;
@@ -41,6 +45,15 @@ abstract class PooledByteBuf<T> extends AbstractReferenceCountedByteBuf {
         this.recyclerHandle = (Handle<PooledByteBuf<T>>) recyclerHandle;
     }
 
+    /**
+     * 为PooledByteBuf类的成员变量赋值
+     * @param chunk
+     * @param handle
+     * @param offset
+     * @param length
+     * @param maxLength
+     * @param cache
+     */
     void init(PoolChunk<T> chunk, long handle, int offset, int length, int maxLength, PoolThreadCache cache) {
         assert handle >= 0;
         assert chunk != null;
@@ -54,6 +67,7 @@ abstract class PooledByteBuf<T> extends AbstractReferenceCountedByteBuf {
         tmpNioBuf = null;
         this.cache = cache;
     }
+
 
     void initUnpooled(PoolChunk<T> chunk, int length) {
         assert chunk != null;

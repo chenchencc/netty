@@ -198,7 +198,7 @@ public final class ChannelOutboundBuffer {
             setWritable(invokeLater);
         }
     }
-
+    //计算可读的大小
     private static long total(Object msg) {
         if (msg instanceof ByteBuf) {
             return ((ByteBuf) msg).readableBytes();

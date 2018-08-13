@@ -54,8 +54,8 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
 
     private final Channel parent;
     private final ChannelId id;
-    private final Unsafe unsafe;
-    private final DefaultChannelPipeline pipeline;
+    private final Unsafe unsafe;//它主要是做什么？
+    private final DefaultChannelPipeline pipeline;//
     private final VoidChannelPromise unsafeVoidPromise = new VoidChannelPromise(this, false);
     private final CloseFuture closeFuture = new CloseFuture(this);
 
@@ -77,8 +77,8 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
     protected AbstractChannel(Channel parent) {
         this.parent = parent;
         id = newId();
-        unsafe = newUnsafe();
-        pipeline = newChannelPipeline();
+        unsafe = newUnsafe();//创建一个Unsafe
+        pipeline = newChannelPipeline();//创建一个ChannelPipeline
     }
 
     /**
@@ -111,7 +111,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
      * Returns a new {@link DefaultChannelPipeline} instance.
      */
     protected DefaultChannelPipeline newChannelPipeline() {
-        return new DefaultChannelPipeline(this);
+        return new DefaultChannelPipeline(this);//根据Channel创建一个ChannelPipeline
     }
 
     @Override
@@ -451,6 +451,11 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             return remoteAddress0();
         }
 
+        /**
+         * 给Channel注册EventLoop
+         * @param eventLoop
+         * @param promise
+         */
         @Override
         public final void register(EventLoop eventLoop, final ChannelPromise promise) {
             if (eventLoop == null) {
@@ -797,7 +802,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             int size;
             try {
                 msg = filterOutboundMessage(msg);
-                size = pipeline.estimatorHandle().size(msg);
+                size = pipeline.estimatorHandle().size(msg);//获取内容大小
                 if (size < 0) {
                     size = 0;
                 }
@@ -806,7 +811,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 ReferenceCountUtil.release(msg);
                 return;
             }
-
+            //追加消息
             outboundBuffer.addMessage(msg, size, promise);
         }
 

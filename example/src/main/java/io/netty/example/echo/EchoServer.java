@@ -48,7 +48,7 @@ public final class EchoServer {
             sslCtx = null;
         }
 
-        // Configure the server.
+        // 为启动netty server配置线程池
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -73,7 +73,7 @@ public final class EchoServer {
             ChannelFuture f = b.bind(PORT).sync();
 
             // Wait until the server socket is closed.
-            f.channel().closeFuture().sync();
+            f.channel().closeFuture().sync();//等待请求
         } finally {
             // Shut down all event loops to terminate all threads.
             bossGroup.shutdownGracefully();

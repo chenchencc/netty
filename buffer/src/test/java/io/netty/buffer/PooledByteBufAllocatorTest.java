@@ -349,7 +349,8 @@ public class PooledByteBufAllocatorTest {
                 int idx = 0;
                 while (!finished) {
                     for (int i = 0; i < 10; i++) {
-                        buffers.add(allocator.directBuffer(
+                        buffers.add(
+                                allocator.directBuffer(
                                 ALLOCATION_SIZES[Math.abs(idx++ % ALLOCATION_SIZES.length)],
                                 Integer.MAX_VALUE));
                     }

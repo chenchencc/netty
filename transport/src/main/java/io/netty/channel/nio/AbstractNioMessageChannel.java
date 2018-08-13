@@ -41,7 +41,7 @@ public abstract class AbstractNioMessageChannel extends AbstractNioChannel {
     protected AbstractNioMessageChannel(Channel parent, SelectableChannel ch, int readInterestOp) {
         super(parent, ch, readInterestOp);
     }
-
+    //创建一个Usafe对象
     @Override
     protected AbstractNioUnsafe newUnsafe() {
         return new NioMessageUnsafe();

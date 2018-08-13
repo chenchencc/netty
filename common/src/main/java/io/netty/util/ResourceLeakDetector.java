@@ -211,7 +211,7 @@ public class ResourceLeakDetector<T> {
     /**
      * Creates a new {@link ResourceLeak} which is expected to be closed via {@link ResourceLeak#close()} when the
      * related resource is deallocated.
-     *
+     * 打开一个资源泄露对象
      * @return the {@link ResourceLeak} or {@code null}
      */
     public final ResourceLeak open(T obj) {
@@ -311,6 +311,11 @@ public class ResourceLeakDetector<T> {
                 "so that only a few instances are created.");
     }
 
+    /**
+     * ResourceLeak接口的默认实现类
+     * DefaultResourceLeak原理：
+     * 在DefaultResourceLeak类中，有一个prev、next的DefaultResourceLeak引用，构成了一个双向连接
+     */
     private final class DefaultResourceLeak extends PhantomReference<Object> implements ResourceLeak {
         private final String creationRecord;
         private final Deque<String> lastRecords = new ArrayDeque<String>();

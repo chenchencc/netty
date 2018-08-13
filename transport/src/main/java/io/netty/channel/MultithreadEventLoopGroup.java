@@ -67,7 +67,7 @@ public abstract class MultithreadEventLoopGroup extends MultithreadEventExecutor
                                      Object... args) {
         super(nThreads == 0 ? DEFAULT_EVENT_LOOP_THREADS : nThreads, executor, chooserFactory, args);
     }
-
+    //创建线程工厂
     @Override
     protected ThreadFactory newDefaultThreadFactory() {
         return new DefaultThreadFactory(getClass(), Thread.MAX_PRIORITY);
@@ -80,7 +80,7 @@ public abstract class MultithreadEventLoopGroup extends MultithreadEventExecutor
 
     @Override
     protected abstract EventLoop newChild(Executor executor, Object... args) throws Exception;
-
+    //注册Channel
     @Override
     public ChannelFuture register(Channel channel) {
         return next().register(channel);

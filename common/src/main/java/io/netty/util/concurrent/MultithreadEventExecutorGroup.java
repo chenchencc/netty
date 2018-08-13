@@ -60,7 +60,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
 
     /**
      * Create a new instance.
-     *
+     * 创建线程实例
      * @param nThreads          the number of threads that will be used by this instance.
      * @param executor          the Executor to use, or {@code null} if the default should be used.
      * @param chooserFactory    the {@link EventExecutorChooserFactory} to use.
@@ -72,16 +72,16 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
             throw new IllegalArgumentException(String.format("nThreads: %d (expected: > 0)", nThreads));
         }
 
-        if (executor == null) {
+        if (executor == null) {//任务执行器如果为空，则创建一个，用来执行任务  非常重要的地方
             executor = new ThreadPerTaskExecutor(newDefaultThreadFactory());
         }
 
-        children = new EventExecutor[nThreads];
+        children = new EventExecutor[nThreads];//创建事件执行器
 
         for (int i = 0; i < nThreads; i ++) {
             boolean success = false;
             try {
-                children[i] = newChild(executor, args);
+                children[i] = newChild(executor, args);//创建EventLoop
                 success = true;
             } catch (Exception e) {
                 // TODO: Think about if this is a good exception type
@@ -107,9 +107,9 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
                 }
             }
         }
-
+        //从children中选择一个EventExecutorChooser
         chooser = chooserFactory.newChooser(children);
-
+        //创建FutureListener
         final FutureListener<Object> terminationListener = new FutureListener<Object>() {
             @Override
             public void operationComplete(Future<Object> future) throws Exception {
@@ -118,7 +118,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
                 }
             }
         };
-
+        //给EventExector添加一个监听器
         for (EventExecutor e: children) {
             e.terminationFuture().addListener(terminationListener);
         }

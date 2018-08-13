@@ -43,7 +43,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Abstract base class for {@link Channel} implementations which use a Selector based approach.
+ * Abstract base class for {@link Channel} implementations which use a Selector based approach. 基于JDK的NIO封装
  */
 public abstract class AbstractNioChannel extends AbstractChannel {
 
@@ -74,6 +74,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 
     /**
      * Create a new instance
+     * 配置SelectableChannel为非阻塞的
      *
      * @param parent            the parent {@link Channel} by which this instance was created. May be {@code null}
      * @param ch                the underlying {@link SelectableChannel} on which it operates
@@ -84,7 +85,7 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         this.ch = ch;
         this.readInterestOp = readInterestOp;
         try {
-            ch.configureBlocking(false);
+            ch.configureBlocking(false);//配置为非阻塞的
         } catch (IOException e) {
             try {
                 ch.close();

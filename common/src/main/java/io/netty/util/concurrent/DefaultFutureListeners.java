@@ -16,7 +16,7 @@
 package io.netty.util.concurrent;
 
 import java.util.Arrays;
-
+//就是一个GenericFutureListener数组，它管理这个数组listeners
 final class DefaultFutureListeners {
 
     private GenericFutureListener<? extends Future<?>>[] listeners;

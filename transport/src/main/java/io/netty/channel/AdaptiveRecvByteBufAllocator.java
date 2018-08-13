@@ -27,6 +27,7 @@ import java.util.List;
  * number of readable bytes if the read operation was not able to fill a certain
  * amount of the allocated buffer two times consecutively.  Otherwise, it keeps
  * returning the same prediction.
+ * RecvByteBufAllocator类会自动调整Buffer的大小通过反馈信息，如果前面的能读到所有的内容，它逐渐提升bytes的大小，相反会降低Buffer的大小
  */
 public class AdaptiveRecvByteBufAllocator extends DefaultMaxMessagesRecvByteBufAllocator {
 
@@ -37,18 +38,21 @@ public class AdaptiveRecvByteBufAllocator extends DefaultMaxMessagesRecvByteBufA
     private static final int INDEX_INCREMENT = 4;
     private static final int INDEX_DECREMENT = 1;
 
-    private static final int[] SIZE_TABLE;
+    private static final int[] SIZE_TABLE;//表的大小为32
 
     static {
         List<Integer> sizeTable = new ArrayList<Integer>();
+        //i = 31
         for (int i = 16; i < 512; i += 16) {
             sizeTable.add(i);
         }
 
+        //i = 22
         for (int i = 512; i > 0; i <<= 1) {
             sizeTable.add(i);
         }
 
+        //sizeTable = 53
         SIZE_TABLE = new int[sizeTable.size()];
         for (int i = 0; i < SIZE_TABLE.length; i ++) {
             SIZE_TABLE[i] = sizeTable.get(i);
@@ -61,6 +65,11 @@ public class AdaptiveRecvByteBufAllocator extends DefaultMaxMessagesRecvByteBufA
     @Deprecated
     public static final AdaptiveRecvByteBufAllocator DEFAULT = new AdaptiveRecvByteBufAllocator();
 
+    /**
+     * 获取size这个值在SIZE_TABLE数组中的index
+     * @param size
+     * @return
+     */
     private static int getSizeTableIndex(final int size) {
         for (int low = 0, high = SIZE_TABLE.length - 1;;) {
             if (high < low) {

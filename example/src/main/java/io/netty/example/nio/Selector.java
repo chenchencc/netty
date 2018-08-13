@@ -3,6 +3,7 @@ package io.netty.example.nio;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -22,7 +23,7 @@ public class Selector {
         while(keyIterator.hasNext()) {
 
             SelectionKey key = keyIterator.next();
-
+            Channel channel = key.channel();
             if(key.isAcceptable()) {
                 // a connection was accepted by a ServerSocketChannel.
 
@@ -31,7 +32,6 @@ public class Selector {
 
             } else if (key.isReadable()) {
                 // a channel is ready for reading
-
             } else if (key.isWritable()) {
                 // a channel is ready for writing
             }

@@ -747,34 +747,34 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.12.1</version>
-        <executions>
-          <execution>
-            <id>check-style</id>
-            <goals>
-              <goal>check</goal>
-            </goals>
-            <phase>validate</phase>
-            <configuration>
-              <consoleOutput>true</consoleOutput>
-              <logViolationsToConsole>true</logViolationsToConsole>
-              <failsOnError>true</failsOnError>
-              <failOnViolation>true</failOnViolation>
-              <configLocation>io/netty/checkstyle.xml</configLocation>
-              <includeTestSourceDirectory>true</includeTestSourceDirectory>
-            </configuration>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>netty-build</artifactId>
-            <version>${netty.build.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
+      <!--<plugin>-->
+        <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
+        <!--<version>2.12.1</version>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<id>check-style</id>-->
+            <!--<goals>-->
+              <!--<goal>check</goal>-->
+            <!--</goals>-->
+            <!--<phase>validate</phase>-->
+            <!--<configuration>-->
+              <!--<consoleOutput>true</consoleOutput>-->
+              <!--<logViolationsToConsole>true</logViolationsToConsole>-->
+              <!--<failsOnError>true</failsOnError>-->
+              <!--<failOnViolation>true</failOnViolation>-->
+              <!--<configLocation>io/netty/checkstyle.xml</configLocation>-->
+              <!--<includeTestSourceDirectory>true</includeTestSourceDirectory>-->
+            <!--</configuration>-->
+          <!--</execution>-->
+        <!--</executions>-->
+        <!--<dependencies>-->
+          <!--<dependency>-->
+            <!--<groupId>${project.groupId}</groupId>-->
+            <!--<artifactId>netty-build</artifactId>-->
+            <!--<version>${netty.build.version}</version>-->
+          <!--</dependency>-->
+        <!--</dependencies>-->
+      <!--</plugin>-->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>xml-maven-plugin</artifactId>
@@ -818,31 +818,31 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <includes>
-            <include>**/*Test*.java</include>
-            <include>**/*Benchmark*.java</include>
-          </includes>
-          <excludes>
-            <exclude>**/Abstract*</exclude>
-            <exclude>**/TestUtil*</exclude>
-          </excludes>
-          <runOrder>random</runOrder>
-          <systemPropertyVariables>
-            <logback.configurationFile>${logging.config}</logback.configurationFile>
-            <logLevel>${logging.logLevel}</logLevel>
-          </systemPropertyVariables>
-          <argLine>${argLine.common} ${argLine.alpnAgent} ${argLine.leak} ${argLine.coverage} ${argLine.noUnsafe}</argLine>
-          <properties>
-            <property>
-              <name>listener</name>
-              <value>io.netty.build.junit.TimedOutTestsListener</value>
-            </property>
-          </properties>
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<artifactId>maven-surefire-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<includes>-->
+            <!--<include>**/*Test*.java</include>-->
+            <!--<include>**/*Benchmark*.java</include>-->
+          <!--</includes>-->
+          <!--<excludes>-->
+            <!--<exclude>**/Abstract*</exclude>-->
+            <!--<exclude>**/TestUtil*</exclude>-->
+          <!--</excludes>-->
+          <!--<runOrder>random</runOrder>-->
+          <!--<systemPropertyVariables>-->
+            <!--<logback.configurationFile>${logging.config}</logback.configurationFile>-->
+            <!--<logLevel>${logging.logLevel}</logLevel>-->
+          <!--</systemPropertyVariables>-->
+          <!--<argLine>${argLine.common} ${argLine.alpnAgent} ${argLine.leak} ${argLine.coverage} ${argLine.noUnsafe}</argLine>-->
+          <!--<properties>-->
+            <!--<property>-->
+              <!--<name>listener</name>-->
+              <!--<value>io.netty.build.junit.TimedOutTestsListener</value>-->
+            <!--</property>-->
+          <!--</properties>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
       <!-- always produce osgi bundles -->
       <plugin>
         <groupId>org.apache.felix</groupId>
@@ -1085,10 +1085,10 @@
           </dependencies>
         </plugin>
         <!-- keep surefire and failsafe in sync -->
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.19.1</version>
-        </plugin>
+        <!--<plugin>-->
+          <!--<artifactId>maven-surefire-plugin</artifactId>-->
+          <!--<version>2.19.1</version>-->
+        <!--</plugin>-->
         <!-- keep surefire and failsafe in sync -->
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
@@ -1198,19 +1198,19 @@
                     <ignore />
                   </action>
                 </pluginExecution>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <versionRange>[1.0,)</versionRange>
-                    <goals>
-                      <goal>check</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
+                <!--<pluginExecution>-->
+                  <!--<pluginExecutionFilter>-->
+                    <!--<groupId>org.apache.maven.plugins</groupId>-->
+                    <!--<artifactId>maven-checkstyle-plugin</artifactId>-->
+                    <!--<versionRange>[1.0,)</versionRange>-->
+                    <!--<goals>-->
+                      <!--<goal>check</goal>-->
+                    <!--</goals>-->
+                  <!--</pluginExecutionFilter>-->
+                  <!--<action>-->
+                    <!--<ignore />-->
+                  <!--</action>-->
+                <!--</pluginExecution>-->
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>

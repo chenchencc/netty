@@ -157,7 +157,7 @@ public class DefaultPromise<V> extends AbstractFuture<V> implements Promise<V> {
         Object result = this.result;
         return (result instanceof CauseHolder) ? ((CauseHolder) result).cause : null;
     }
-
+    //添加监听器
     @Override
     public Promise<V> addListener(GenericFutureListener<? extends Future<? super V>> listener) {
         checkNotNull(listener, "listener");
@@ -337,8 +337,8 @@ public class DefaultPromise<V> extends AbstractFuture<V> implements Promise<V> {
 
     @Override
     public Promise<V> sync() throws InterruptedException {
-        await();
-        rethrowIfFailed();
+        await();//等待
+        rethrowIfFailed();//抛出异常
         return this;
     }
 

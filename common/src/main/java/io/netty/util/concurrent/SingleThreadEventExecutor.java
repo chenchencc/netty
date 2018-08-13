@@ -93,12 +93,12 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         PROPERTIES_UPDATER = propertiesUpdater;
     }
 
-    private final Queue<Runnable> taskQueue;
+    private final Queue<Runnable> taskQueue;//队列
 
     private volatile Thread thread;
     @SuppressWarnings("unused")
     private volatile ThreadProperties threadProperties;
-    private final Executor executor;
+    private final Executor executor;//执行器  非常重要的地方，
     private volatile boolean interrupted;
 
     private final Semaphore threadLock = new Semaphore(0);
@@ -194,6 +194,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
      * calls on the this {@link Queue} it may make sense to {@code @Override} this and return some more performant
      * implementation that does not support blocking operations at all.
      */
+    //创建一个阻塞队列
     protected Queue<Runnable> newTaskQueue(int maxPendingTasks) {
         return new LinkedBlockingQueue<Runnable>(maxPendingTasks);
     }
@@ -212,12 +213,14 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     /**
      * @see {@link Queue#poll()}
+     * 从任务队列中弹出一个任务
      */
     protected Runnable pollTask() {
         assert inEventLoop();
         return pollTaskFrom(taskQueue);
     }
 
+    //从队列中弹出一个任务，如果队列为空，会一直等待有任务为止
     protected final Runnable pollTaskFrom(Queue<Runnable> taskQueue) {
         for (;;) {
             Runnable task = taskQueue.poll();
@@ -308,6 +311,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     /**
      * @see {@link Queue#isEmpty()}
+     * 判断是否有任务，判断taskQueue的大小是否为空即可
      */
     protected boolean hasTasks() {
         assert inEventLoop();
@@ -549,6 +553,15 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         return ran;
     }
 
+    /**
+     * 优雅停机
+     * @param quietPeriod the quiet period as described in the documentation
+     * @param timeout     the maximum amount of time to wait until the executor is {@linkplain #shutdown()}
+     *                    regardless if a task was submitted during the quiet period
+     * @param unit        the unit of {@code quietPeriod} and {@code timeout}
+     *
+     * @return
+     */
     @Override
     public Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
         if (quietPeriod < 0) {
@@ -606,7 +619,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
         return terminationFuture();
     }
-
+    //DefaultPromise是指可写的Future，JDK版本的Future是不可写的，
     @Override
     public Future<?> terminationFuture() {
         return terminationFuture;
@@ -747,6 +760,10 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         return isTerminated();
     }
 
+    /**
+     * 系统Task
+     * @param task
+     */
     @Override
     public void execute(Runnable task) {
         if (task == null) {
@@ -757,6 +774,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
         if (inEventLoop) {
             addTask(task);
         } else {
+            // important
             startThread();
             addTask(task);
             if (isShutdown() && removeTask(task)) {
@@ -849,14 +867,21 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     private static final long SCHEDULE_PURGE_INTERVAL = TimeUnit.SECONDS.toNanos(1);
 
+    /**
+     * 启动线程
+     */
     private void startThread() {
         if (STATE_UPDATER.get(this) == ST_NOT_STARTED) {
+            //Unsafe进行判断
             if (STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)) {
                 doStartThread();
             }
         }
     }
 
+    /**
+     * 启动
+     */
     private void doStartThread() {
         assert thread == null;
         executor.execute(new Runnable() {

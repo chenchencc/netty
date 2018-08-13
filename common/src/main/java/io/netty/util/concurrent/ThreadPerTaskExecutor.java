@@ -17,7 +17,7 @@ package io.netty.util.concurrent;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadFactory;
-
+//线程执行器：它会根据线程工厂创建一个新的线程然后用来执行这个任务
 public final class ThreadPerTaskExecutor implements Executor {
     private final ThreadFactory threadFactory;
 

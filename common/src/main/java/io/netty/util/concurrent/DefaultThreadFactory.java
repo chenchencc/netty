@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
+/** 线程工厂，DefaultThreadFactory它实现了JDK的ThreadFactory接口
  * A {@link ThreadFactory} implementation with a simple naming rule.
  */
 public class DefaultThreadFactory implements ThreadFactory {

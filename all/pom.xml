@@ -460,7 +460,7 @@
       </plugin>
 
       <!-- Disable checkstyle -->
-      <plugin>
+     <!-- <plugin>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <executions>
           <execution>
@@ -468,7 +468,7 @@
             <phase>none</phase>
           </execution>
         </executions>
-      </plugin>
+      </plugin>-->
 
       <!-- Disable all plugin executions configured by jar packaging -->
       <plugin>
@@ -497,15 +497,15 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-test</id>
-            <phase>none</phase>
-          </execution>
-        </executions>
-      </plugin>
+      <!--<plugin>-->
+        <!--<artifactId>maven-surefire-plugin</artifactId>-->
+        <!--<executions>-->
+          <!--<execution>-->
+            <!--<id>default-test</id>-->
+            <!--<phase>none</phase>-->
+          <!--</execution>-->
+        <!--</executions>-->
+      <!--</plugin>-->
 
       <!-- Generate Xref -->
       <plugin>

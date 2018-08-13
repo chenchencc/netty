@@ -133,7 +133,7 @@ public final class PlatformDependent {
         // * >  0  - Don't use cleaner. This will limit Netty's total direct memory
         //           (note: that JDK's direct memory limit is independent of this).
         long maxDirectMemory = SystemPropertyUtil.getLong("io.netty.maxDirectMemory", -1);
-
+        //最大的直接内存是0或者是否支持un.misc.Unsafe或者判断ByteBuffer是否有ByteBuffer(long.class, int.class)的构造器
         if (maxDirectMemory == 0 || !hasUnsafe() || !PlatformDependent0.hasDirectBufferNoCleanerConstructor()) {
             USE_DIRECT_BUFFER_NO_CLEANER = false;
             DIRECT_MEMORY_COUNTER = null;
@@ -360,7 +360,7 @@ public final class PlatformDependent {
             PlatformDependent0.freeDirectBuffer(buffer);
         }
     }
-
+    //获取Buffer在内存中的地址
     public static long directBufferAddress(ByteBuffer buffer) {
         return PlatformDependent0.directBufferAddress(buffer);
     }
@@ -576,7 +576,7 @@ public final class PlatformDependent {
         assert USE_DIRECT_BUFFER_NO_CLEANER;
 
         incrementMemoryCounter(capacity);
-        try {
+        try {//利用反射技术创建一个JDK的DirectByteBuffer
             return PlatformDependent0.allocateDirectNoCleaner(capacity);
         } catch (Throwable e) {
             decrementMemoryCounter(capacity);
@@ -872,6 +872,7 @@ public final class PlatformDependent {
             }
         }
 
+        //返回的这两个队列都是基于JDK的Unsafe来实现的
         static <T> Queue<T> newMpscQueue(final int maxCapacity) {
             if (USE_MPSC_CHUNKED_ARRAY_QUEUE) {
                 // Calculate the max capacity which can not be bigger then MAX_ALLOWED_MPSC_CAPACITY.
@@ -897,6 +898,7 @@ public final class PlatformDependent {
     /**
      * Create a new {@link Queue} which is safe to use for multiple producers (different threads) and a single
      * consumer (one thread!).
+     * 创建一个队列，它是一个安全的对于多个生产者和一个消费者来说（单线程的）
      */
     public static <T> Queue<T> newMpscQueue(final int maxCapacity) {
         return Mpsc.newMpscQueue(maxCapacity);
@@ -1155,7 +1157,7 @@ public final class PlatformDependent {
             return false;
         }
     }
-
+    //获取netty中最大的直接内存
     private static long maxDirectMemory0() {
         long maxDirectMemory = 0;
         try {

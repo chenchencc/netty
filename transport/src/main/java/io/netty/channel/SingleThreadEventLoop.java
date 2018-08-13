@@ -32,10 +32,11 @@ import java.util.concurrent.ThreadFactory;
  */
 public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor implements EventLoop {
 
+    //最大任务数
     protected static final int DEFAULT_MAX_PENDING_TASKS = Math.max(16,
             SystemPropertyUtil.getInt("io.netty.eventLoop.maxPendingTasks", Integer.MAX_VALUE));
 
-    private final Queue<Runnable> tailTasks;
+    private final Queue<Runnable> tailTasks;//任务队列
 
     protected SingleThreadEventLoop(EventLoopGroup parent, ThreadFactory threadFactory, boolean addTaskWakesUp) {
         this(parent, threadFactory, addTaskWakesUp, DEFAULT_MAX_PENDING_TASKS, RejectedExecutionHandlers.reject());
@@ -68,9 +69,10 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
     public EventLoop next() {
         return (EventLoop) super.next();
     }
-
+    //注册Channel
     @Override
     public ChannelFuture register(Channel channel) {
+
         return register(new DefaultChannelPromise(channel, this));
     }
 
@@ -143,6 +145,7 @@ public abstract class SingleThreadEventLoop extends SingleThreadEventExecutor im
         return super.hasTasks() || !tailTasks.isEmpty();
     }
 
+    //最大挂起任务
     @Override
     public int pendingTasks() {
         return super.pendingTasks() + tailTasks.size();

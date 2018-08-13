@@ -28,6 +28,7 @@ import java.util.Map;
 
 /**
  * Exposes the configuration of an {@link AbstractBootstrap}.
+ * 该类主要就是设置Channel的工厂和IP地址
  */
 public abstract class AbstractBootstrapConfig<B extends AbstractBootstrap<B, C>, C extends Channel> {
 

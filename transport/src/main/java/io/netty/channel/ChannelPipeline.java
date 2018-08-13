@@ -594,9 +594,11 @@ public interface ChannelPipeline
      */
     Map<String, ChannelHandler> toMap();
 
+    //调用 ChannelPipeline 中下一个 ChannelInboundHandler 的 channelRegistered(ChannelHandlerContext)方法
     @Override
     ChannelPipeline fireChannelRegistered();
 
+    //调用 ChannelPipeline 中下一个 ChannelInboundHandler 的 channelUnRegistered(ChannelHandlerContext)方法
      @Override
     ChannelPipeline fireChannelUnregistered();
 

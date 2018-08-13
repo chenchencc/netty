@@ -28,8 +28,8 @@ import static java.lang.Math.*;
 final class PoolChunkList<T> implements PoolChunkListMetric {
     private static final Iterator<PoolChunkMetric> EMPTY_METRICS = Collections.<PoolChunkMetric>emptyList().iterator();
     private final PoolChunkList<T> nextList;
-    private final int minUsage;
-    private final int maxUsage;
+    private final int minUsage;//最小使用率
+    private final int maxUsage;//最大使用率
     private final int maxCapacity;
 
     private PoolChunk<T> head;
@@ -73,10 +73,18 @@ final class PoolChunkList<T> implements PoolChunkListMetric {
         this.prevList = prevList;
     }
 
+    /**
+     * 从PoolChunkList内存池中分配一块内存
+     * @param buf
+     * @param reqCapacity
+     * @param normCapacity
+     * @return
+     */
     boolean allocate(PooledByteBuf<T> buf, int reqCapacity, int normCapacity) {
         if (head == null || normCapacity > maxCapacity) {
             // Either this PoolChunkList is empty or the requested capacity is larger then the capacity which can
             // be handled by the PoolChunks that are contained in this PoolChunkList.
+            //PoolChunkList 当前链表为空或者申请内存的大小大于当前链表的利用率直接返回false
             return false;
         }
 
@@ -135,6 +143,10 @@ final class PoolChunkList<T> implements PoolChunkListMetric {
         return prevList.move(chunk);
     }
 
+    /**
+     * 将这个PoolChunk加入到PoolChunkList中
+     * @param chunk
+     */
     void add(PoolChunk<T> chunk) {
         if (chunk.usage() >= maxUsage) {
             nextList.add(chunk);

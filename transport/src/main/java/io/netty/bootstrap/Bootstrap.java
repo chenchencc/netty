@@ -239,6 +239,12 @@ public class Bootstrap extends AbstractBootstrap<Bootstrap, Channel> {
         return promise;
     }
 
+    /**
+     *  important
+     * @param remoteAddress
+     * @param localAddress
+     * @param connectPromise
+     */
     private static void doConnect(
             final SocketAddress remoteAddress, final SocketAddress localAddress, final ChannelPromise connectPromise) {
 

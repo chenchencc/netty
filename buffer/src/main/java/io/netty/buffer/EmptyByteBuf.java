@@ -35,7 +35,7 @@ import java.nio.charset.Charset;
  * An empty {@link ByteBuf} whose capacity and maximum capacity are all {@code 0}.
  */
 public final class EmptyByteBuf extends ByteBuf {
-
+    //调用JDK的ByteBuffer.allocateDirect方法分配一个capacity为0的ByteBuffer（直接new）
     private static final ByteBuffer EMPTY_BYTE_BUFFER = ByteBuffer.allocateDirect(0);
     private static final long EMPTY_BYTE_BUFFER_ADDRESS;
 
@@ -43,7 +43,7 @@ public final class EmptyByteBuf extends ByteBuf {
         long emptyByteBufferAddress = 0;
         try {
             if (PlatformDependent.hasUnsafe()) {
-                emptyByteBufferAddress = PlatformDependent.directBufferAddress(EMPTY_BYTE_BUFFER);
+                emptyByteBufferAddress = PlatformDependent.directBufferAddress(EMPTY_BYTE_BUFFER);//获取ByteBuffer在内存中的偏移量
             }
         } catch (Throwable t) {
             // Ignore

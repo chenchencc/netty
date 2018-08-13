@@ -19,25 +19,34 @@ package io.netty.buffer;
 final class PoolSubpage<T> implements PoolSubpageMetric {
 
     final PoolChunk<T> chunk;
+    //PoolSubpage在chunk中的index
     private final int memoryMapIdx;
+    //当前page在chunk.memory的偏移量
     private final int runOffset;
+    //// page大小
     private final int pageSize;
-    private final long[] bitmap;
+    //通过对每一个二进制位的标记来修改一段内存的占用状态
+    private final long[] bitmap;//
 
     PoolSubpage<T> prev;
     PoolSubpage<T> next;
 
     boolean doNotDestroy;
+    // 该page切分后每一段的大小
     int elemSize;
+    // 该page包含的段数量
     private int maxNumElems;
     private int bitmapLength;
+    // 下一个可用的位置
     private int nextAvail;
     private int numAvail;
 
     // TODO: Test if adding padding helps under contention
     //private long pad0, pad1, pad2, pad3, pad4, pad5, pad6, pad7;
 
-    /** Special constructor that creates a linked list head */
+    /** Special constructor that creates a linked list head
+     * 创建一个链表的头
+     */
     PoolSubpage(int pageSize) {
         chunk = null;
         memoryMapIdx = -1;
@@ -52,7 +61,7 @@ final class PoolSubpage<T> implements PoolSubpageMetric {
         this.memoryMapIdx = memoryMapIdx;
         this.runOffset = runOffset;
         this.pageSize = pageSize;
-        bitmap = new long[pageSize >>> 10]; // pageSize / 16 / 64
+        bitmap = new long[pageSize >>> 10]; // size = pageSize/16/64
         init(head, elemSize);
     }
 
@@ -60,6 +69,7 @@ final class PoolSubpage<T> implements PoolSubpageMetric {
         doNotDestroy = true;
         this.elemSize = elemSize;
         if (elemSize != 0) {
+            //按申请内存大小将pageSize划分
             maxNumElems = numAvail = pageSize / elemSize;
             nextAvail = 0;
             bitmapLength = maxNumElems >>> 6;
@@ -86,7 +96,9 @@ final class PoolSubpage<T> implements PoolSubpageMetric {
             return -1;
         }
 
+        //在subpage数组中寻找一个可用的元素
         final int bitmapIdx = getNextAvail();
+        //确定其位置0~63=0 64~ = 1
         int q = bitmapIdx >>> 6;
         int r = bitmapIdx & 63;
         assert (bitmap[q] >>> r & 1) == 0;
@@ -134,7 +146,7 @@ final class PoolSubpage<T> implements PoolSubpageMetric {
             return false;
         }
     }
-
+    //将this(PoolSubpage添加到PoolSubpage链表中)
     private void addToPool(PoolSubpage<T> head) {
         assert prev == null && next == null;
         prev = head;
@@ -143,6 +155,9 @@ final class PoolSubpage<T> implements PoolSubpageMetric {
         head.next = this;
     }
 
+    /**
+     * 表示该内存为不可用了，从链表中删除
+     */
     private void removeFromPool() {
         assert prev != null && next != null;
         prev.next = next;
@@ -155,6 +170,10 @@ final class PoolSubpage<T> implements PoolSubpageMetric {
         nextAvail = bitmapIdx;
     }
 
+    /**
+     * 获取下一个可以的subpage
+     * @return
+     */
     private int getNextAvail() {
         int nextAvail = this.nextAvail;
         if (nextAvail >= 0) {
@@ -164,6 +183,10 @@ final class PoolSubpage<T> implements PoolSubpageMetric {
         return findNextAvail();
     }
 
+    /**
+     * 
+     * @return
+     */
     private int findNextAvail() {
         final long[] bitmap = this.bitmap;
         final int bitmapLength = this.bitmapLength;

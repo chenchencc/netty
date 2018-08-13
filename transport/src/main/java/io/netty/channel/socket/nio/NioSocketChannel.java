@@ -50,7 +50,7 @@ import java.util.concurrent.Executor;
 public class NioSocketChannel extends AbstractNioByteChannel implements io.netty.channel.socket.SocketChannel {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(NioSocketChannel.class);
     private static final SelectorProvider DEFAULT_SELECTOR_PROVIDER = SelectorProvider.provider();
-
+    //根据SelectorProvider对象获取一个SocketChannel实例
     private static SocketChannel newSocket(SelectorProvider provider) {
         try {
             /**
@@ -360,6 +360,13 @@ public class NioSocketChannel extends AbstractNioByteChannel implements io.netty
         javaChannel().close();
     }
 
+    /**
+     * important
+     * 读取数据
+     * @param byteBuf
+     * @return
+     * @throws Exception
+     */
     @Override
     protected int doReadBytes(ByteBuf byteBuf) throws Exception {
         final RecvByteBufAllocator.Handle allocHandle = unsafe().recvBufAllocHandle();
@@ -449,7 +456,7 @@ public class NioSocketChannel extends AbstractNioByteChannel implements io.netty
             }
         }
     }
-
+    //创建一个AbstractNioUnsafe
     @Override
     protected AbstractNioUnsafe newUnsafe() {
         return new NioSocketChannelUnsafe();

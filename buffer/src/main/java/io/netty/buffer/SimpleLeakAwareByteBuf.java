@@ -20,6 +20,10 @@ import io.netty.util.ResourceLeak;
 
 import java.nio.ByteOrder;
 
+/**
+ * 使用了外观模式来实现
+ * 其实就是调用了ByteBuf的方法，只是重写了
+ */
 final class SimpleLeakAwareByteBuf extends WrappedByteBuf {
 
     private final ResourceLeak leak;

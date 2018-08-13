@@ -102,6 +102,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             }
         }
 
+        //important
         @Override
         public final void read() {
             final ChannelConfig config = config();
@@ -114,7 +115,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             boolean close = false;
             try {
                 do {
-                    byteBuf = allocHandle.allocate(allocator);
+                    byteBuf = allocHandle.allocate(allocator);//分配ByteBuf @important
                     allocHandle.lastBytesRead(doReadBytes(byteBuf));
                     if (allocHandle.lastBytesRead() <= 0) {
                         // nothing was read. release the buffer.
@@ -151,7 +152,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             }
         }
     }
-
+    //真正写数据的地方
     @Override
     protected void doWrite(ChannelOutboundBuffer in) throws Exception {
         int writeSpinCount = -1;
@@ -249,7 +250,7 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             if (buf.isDirect()) {
                 return msg;
             }
-
+            //创建一个DirectBuffer
             return newDirectBuffer(buf);
         }
 

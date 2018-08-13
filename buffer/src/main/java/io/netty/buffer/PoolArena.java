@@ -28,6 +28,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Math.max;
 
+/**
+ * 内存分配的基类,
+ * @param <T>
+ */
 abstract class PoolArena<T> implements PoolArenaMetric {
     static final boolean HAS_UNSAFE = PlatformDependent.hasUnsafe();
 
@@ -37,7 +41,7 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         Normal
     }
 
-    static final int numTinySubpagePools = 512 >>> 4;
+    static final int numTinySubpagePools = 512 >>> 4;//512>>>4=32   8192=8K
 
     final PooledByteBufAllocator parent;
 
@@ -47,9 +51,17 @@ abstract class PoolArena<T> implements PoolArenaMetric {
     final int chunkSize;
     final int subpageOverflowMask;
     final int numSmallSubpagePools;
-    private final PoolSubpage<T>[] tinySubpagePools;
-    private final PoolSubpage<T>[] smallSubpagePools;
+    private final PoolSubpage<T>[] tinySubpagePools;//为什么PoolArena类中海油PoolSubpage 存放Head？主要就是存放PoolChunk中PoolSubpage数组中的头Head节点，主要是为了
+    private final PoolSubpage<T>[] smallSubpagePools;//为什么PoolArena类中海油PoolSubpage
 
+    /**
+     qInit：存储内存利用率0-25%的chunk
+     q000：存储内存利用率1-50%的chunk
+     q025：存储内存利用率25-75%的chunk
+     q050：存储内存利用率50-100%的chunk
+     q075：存储内存利用率75-100%个chunk
+     q100：存储内存利用率100%chunk
+     */
     private final PoolChunkList<T> q050;
     private final PoolChunkList<T> q025;
     private final PoolChunkList<T> q000;
@@ -74,7 +86,7 @@ abstract class PoolArena<T> implements PoolArenaMetric {
     // We need to use the LongCounter here as this is not guarded via synchronized block.
     private final LongCounter deallocationsHuge = PlatformDependent.newLongCounter();
 
-    // Number of thread caches backed by this arena.
+    // Number of thread caches backed by this arena. 缓存的线程数
     final AtomicInteger numThreadCaches = new AtomicInteger();
 
     // TODO: Test if adding padding helps under contention
@@ -87,9 +99,10 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         this.pageShifts = pageShifts;
         this.chunkSize = chunkSize;
         subpageOverflowMask = ~(pageSize - 1);
+        //创建一个tiny PoolSubpage数组
         tinySubpagePools = newSubpagePoolArray(numTinySubpagePools);
         for (int i = 0; i < tinySubpagePools.length; i ++) {
-            tinySubpagePools[i] = newSubpagePoolHead(pageSize);
+            tinySubpagePools[i] = newSubpagePoolHead(pageSize);//给PoolSubpage数组赋值
         }
 
         numSmallSubpagePools = pageShifts - 9;
@@ -98,6 +111,9 @@ abstract class PoolArena<T> implements PoolArenaMetric {
             smallSubpagePools[i] = newSubpagePoolHead(pageSize);
         }
 
+        /**
+         * 连续定义6个PoolChunkList，并组成一个链表，每个PoolChunkList的minUsage、maxUsage都是事先定义好的
+         */
         q100 = new PoolChunkList<T>(null, 100, Integer.MAX_VALUE, chunkSize);
         q075 = new PoolChunkList<T>(q100, 75, 100, chunkSize);
         q050 = new PoolChunkList<T>(q075, 50, 100, chunkSize);
@@ -111,6 +127,10 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         q025.prevList(q000);
         q000.prevList(null);
         qInit.prevList(qInit);
+
+
+        //qInit - q000 = q025 =  q050 =  q075 =  q100
+        //也就是qInit和q000链表之间是单向的
 
         List<PoolChunkListMetric> metrics = new ArrayList<PoolChunkListMetric>(6);
         metrics.add(qInit);
@@ -129,19 +149,24 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         return head;
     }
 
+    /**
+     * 创建一个PoolSubpage数组
+     * @param size
+     * @return
+     */
     @SuppressWarnings("unchecked")
     private PoolSubpage<T>[] newSubpagePoolArray(int size) {
         return new PoolSubpage[size];
     }
 
     abstract boolean isDirect();
-
+    //分配一个PooledByteBuf
     PooledByteBuf<T> allocate(PoolThreadCache cache, int reqCapacity, int maxCapacity) {
         PooledByteBuf<T> buf = newByteBuf(maxCapacity);
         allocate(cache, buf, reqCapacity);
         return buf;
     }
-
+    //normCapacity变量向右位移4位
     static int tinyIdx(int normCapacity) {
         return normCapacity >>> 4;
     }
@@ -166,17 +191,26 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         return (normCapacity & 0xFFFFFE00) == 0;
     }
 
+    /** important
+     * 分配内存的核心方法
+     * @param cache
+     * @param buf
+     * @param reqCapacity
+     */
     private void allocate(PoolThreadCache cache, PooledByteBuf<T> buf, final int reqCapacity) {
         final int normCapacity = normalizeCapacity(reqCapacity);
+        //normCapacity<8K
         if (isTinyOrSmall(normCapacity)) { // capacity < pageSize
             int tableIdx;
             PoolSubpage<T>[] table;
+            //normCapacity < 512
             boolean tiny = isTiny(normCapacity);
             if (tiny) { // < 512
                 if (cache.allocateTiny(this, buf, reqCapacity, normCapacity)) {
                     // was able to allocate out of the cache so move on
                     return;
                 }
+
                 tableIdx = tinyIdx(normCapacity);
                 table = tinySubpagePools;
             } else {
@@ -210,7 +244,7 @@ abstract class PoolArena<T> implements PoolArenaMetric {
                     return;
                 }
             }
-            allocateNormal(buf, reqCapacity, normCapacity);
+            allocateNormal(buf, reqCapacity, normCapacity);//正常分配一个PoolChunk
             return;
         }
         if (normCapacity <= chunkSize) {
@@ -226,6 +260,7 @@ abstract class PoolArena<T> implements PoolArenaMetric {
     }
 
     private synchronized void allocateNormal(PooledByteBuf<T> buf, int reqCapacity, int normCapacity) {
+        //先从内存池中获取，为什么查找的顺序是q050->q025->q000->qInit->q075
         if (q050.allocate(buf, reqCapacity, normCapacity) || q025.allocate(buf, reqCapacity, normCapacity) ||
             q000.allocate(buf, reqCapacity, normCapacity) || qInit.allocate(buf, reqCapacity, normCapacity) ||
             q075.allocate(buf, reqCapacity, normCapacity)) {
@@ -234,7 +269,9 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         }
 
         // Add a new chunk.
+        //创建一个PoolChunk,这里会分Direct、Heap
         PoolChunk<T> c = newChunk(pageSize, maxOrder, pageShifts, chunkSize);
+        //获取一个句柄
         long handle = c.allocate(normCapacity);
         ++allocationsNormal;
         assert handle > 0;
@@ -242,7 +279,15 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         qInit.add(c);
     }
 
+    /**
+     * 分配一个大的内存
+     * @param buf
+     * @param reqCapacity
+     */
     private void allocateHuge(PooledByteBuf<T> buf, int reqCapacity) {
+        /**
+         * 创建一个非池化的PoolChunk
+         */
         PoolChunk<T> chunk = newUnpooledChunk(reqCapacity);
         activeBytesHuge.add(chunk.chunkSize());
         buf.initUnpooled(chunk, reqCapacity);
@@ -297,6 +342,11 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         }
     }
 
+    /**
+     * 根据 elemSize（subpage大小）在PoolSubpage数组中寻找一个PoolSubpage
+     * @param elemSize
+     * @return
+     */
     PoolSubpage<T> findSubpagePoolHead(int elemSize) {
         int tableIdx;
         PoolSubpage<T>[] table;
@@ -304,6 +354,7 @@ abstract class PoolArena<T> implements PoolArenaMetric {
             tableIdx = elemSize >>> 4;
             table = tinySubpagePools;
         } else {
+            //512~8K
             tableIdx = 0;
             elemSize >>>= 10;
             while (elemSize != 0) {
@@ -316,14 +367,22 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         return table[tableIdx];
     }
 
+    /**
+     * 判断reqCapacity的大小，如果reqCapacity大于chunkSize则返回chunkSize的默认值（16M）
+     * @param reqCapacity
+     * @return
+     */
     int normalizeCapacity(int reqCapacity) {
         if (reqCapacity < 0) {
             throw new IllegalArgumentException("capacity: " + reqCapacity + " (expected: 0+)");
         }
+
+        //如果大于16M，则返回16M即可
         if (reqCapacity >= chunkSize) {
             return reqCapacity;
         }
 
+        //reqCapacity in [512,8K]
         if (!isTiny(reqCapacity)) { // >= 512
             // Doubled
 
@@ -617,8 +676,11 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         }
     }
 
+    /**
+     * JVM堆内存分配方式，JVM堆分配的是一个byte[]数组
+     */
     static final class HeapArena extends PoolArena<byte[]> {
-
+        //pageSize=8192（8KB） maxOrder=11  pageShifts = 13  chunkSize=16777216=16MB
         HeapArena(PooledByteBufAllocator parent, int pageSize, int maxOrder, int pageShifts, int chunkSize) {
             super(parent, pageSize, maxOrder, pageShifts, chunkSize);
         }
@@ -628,8 +690,17 @@ abstract class PoolArena<T> implements PoolArenaMetric {
             return false;
         }
 
+        /**
+         * 默认分配一个大的内存，然后让后面的操作进行瓜分，默认是16M的内存
+         * @param pageSize
+         * @param maxOrder
+         * @param pageShifts
+         * @param chunkSize
+         * @return
+         */
         @Override
         protected PoolChunk<byte[]> newChunk(int pageSize, int maxOrder, int pageShifts, int chunkSize) {
+            //直接创建一个byte[chunkSize]数组
             return new PoolChunk<byte[]>(this, new byte[chunkSize], pageSize, maxOrder, pageShifts, chunkSize);
         }
 
@@ -643,6 +714,11 @@ abstract class PoolArena<T> implements PoolArenaMetric {
             // Rely on GC.
         }
 
+        /**
+         * 根据maxCapacity
+         * @param maxCapacity
+         * @return
+         */
         @Override
         protected PooledByteBuf<byte[]> newByteBuf(int maxCapacity) {
             return HAS_UNSAFE ? PooledUnsafeHeapByteBuf.newUnsafeInstance(maxCapacity)
@@ -659,6 +735,9 @@ abstract class PoolArena<T> implements PoolArenaMetric {
         }
     }
 
+    /**
+     * 直接内存分配方式，为什么直接内存是ByteBuffer，而不是netty的ByteBuf呢？
+     */
     static final class DirectArena extends PoolArena<ByteBuffer> {
 
         DirectArena(PooledByteBufAllocator parent, int pageSize, int maxOrder, int pageShifts, int chunkSize) {
@@ -670,8 +749,17 @@ abstract class PoolArena<T> implements PoolArenaMetric {
             return true;
         }
 
+        /**
+         * 创建一个新的PoolChunk，实际上是创建一个JDK的ByteBuffer
+         * @param pageSize
+         * @param maxOrder
+         * @param pageShifts
+         * @param chunkSize
+         * @return
+         */
         @Override
         protected PoolChunk<ByteBuffer> newChunk(int pageSize, int maxOrder, int pageShifts, int chunkSize) {
+            //使用allocateDirect(chunkSize)方法进行分配
             return new PoolChunk<ByteBuffer>(
                     this, allocateDirect(chunkSize),
                     pageSize, maxOrder, pageShifts, chunkSize);
@@ -682,6 +770,13 @@ abstract class PoolArena<T> implements PoolArenaMetric {
             return new PoolChunk<ByteBuffer>(this, allocateDirect(capacity), capacity);
         }
 
+        /**
+         * 直接内存分配的核心点，
+         * 1.ByteBuffer.allocateDirect方法就是调用JDK的ByteBuffer的分配方式，JDK的ByteBuffer类底层是利用Unsafe来来实现直接内存分配的
+         * 2.PlatformDependent.allocateDirectNoCleaner
+         * @param capacity
+         * @return
+         */
         private static ByteBuffer allocateDirect(int capacity) {
             return PlatformDependent.useDirectBufferNoCleaner() ?
                     PlatformDependent.allocateDirectNoCleaner(capacity) : ByteBuffer.allocateDirect(capacity);
@@ -695,7 +790,7 @@ abstract class PoolArena<T> implements PoolArenaMetric {
                 PlatformDependent.freeDirectBuffer(chunk.memory);
             }
         }
-
+        //创建一个PooledByteBuf实例
         @Override
         protected PooledByteBuf<ByteBuffer> newByteBuf(int maxCapacity) {
             if (HAS_UNSAFE) {

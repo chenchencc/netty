@@ -229,12 +229,12 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <skip>${skipOsgiTestsuite}</skip>
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<artifactId>maven-surefire-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<skip>${skipOsgiTestsuite}</skip>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
     </plugins>
   </build>
 </project>

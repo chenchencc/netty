@@ -35,7 +35,7 @@ import static io.netty.channel.ChannelOption.*;
  */
 public class DefaultSocketChannelConfig extends DefaultChannelConfig
                                         implements SocketChannelConfig {
-
+    //给JDK的Socket设置配置
     protected final Socket javaSocket;
     private volatile boolean allowHalfClosure;
 

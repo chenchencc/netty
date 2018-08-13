@@ -199,6 +199,7 @@ public abstract class AbstractByteBuf extends ByteBuf {
         return this;
     }
 
+    //清除已读的空间
     @Override
     public ByteBuf discardReadBytes() {
         ensureAccessible();
@@ -239,7 +240,7 @@ public abstract class AbstractByteBuf extends ByteBuf {
         }
         return this;
     }
-
+    //调整标记位置
     protected final void adjustMarkers(int decrement) {
         int markedReaderIndex = this.markedReaderIndex;
         if (markedReaderIndex <= decrement) {

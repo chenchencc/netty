@@ -23,6 +23,7 @@ import io.netty.util.internal.StringUtil;
 
 /**
  * Skeletal {@link ByteBufAllocator} implementation to extend.
+ * 主要用来分配缓冲区
  */
 public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
     private static final int DEFAULT_INITIAL_CAPACITY = 256;
@@ -34,6 +35,7 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
             case SIMPLE:
                 leak = AbstractByteBuf.leakDetector.open(buf);
                 if (leak != null) {
+                    //简单的
                     buf = new SimpleLeakAwareByteBuf(buf, leak);
                 }
                 break;
@@ -41,6 +43,7 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
             case PARANOID:
                 leak = AbstractByteBuf.leakDetector.open(buf);
                 if (leak != null) {
+                    //高级的
                     buf = new AdvancedLeakAwareByteBuf(buf, leak);
                 }
                 break;
@@ -89,7 +92,8 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
      *                     a heap buffer
      */
     protected AbstractByteBufAllocator(boolean preferDirect) {
-        directByDefault = preferDirect && PlatformDependent.hasUnsafe();
+        directByDefault = preferDirect && PlatformDependent.hasUnsafe();//判断classpath是否有sun.misc.Unsafe类
+        //床架一个空的ByteBuffer
         emptyBuf = new EmptyByteBuf(this);
     }
 
@@ -160,6 +164,10 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
         return newHeapBuffer(initialCapacity, maxCapacity);
     }
 
+    /**
+     * 分配堆外直接内存
+     * @return
+     */
     @Override
     public ByteBuf directBuffer() {
         return directBuffer(DEFAULT_INITIAL_CAPACITY, Integer.MAX_VALUE);
@@ -176,6 +184,7 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
             return emptyBuf;
         }
         validate(initialCapacity, maxCapacity);
+        //分配直接内存缓冲
         return newDirectBuffer(initialCapacity, maxCapacity);
     }
 

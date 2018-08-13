@@ -29,8 +29,8 @@ final class SelectedSelectionKeySet extends AbstractSet<SelectionKey> {
     private boolean isA = true;
 
     SelectedSelectionKeySet() {
-        keysA = new SelectionKey[1024];
-        keysB = keysA.clone();
+        keysA = new SelectionKey[1024];//创建一个1024大小的数组
+        keysB = keysA.clone();//创建一个keysA的副本
     }
 
     @Override

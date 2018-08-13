@@ -48,7 +48,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
     private final Map<AttributeKey<?>, Object> childAttrs = new LinkedHashMap<AttributeKey<?>, Object>();
     private final ServerBootstrapConfig config = new ServerBootstrapConfig(this);
     private volatile EventLoopGroup childGroup;
-    private volatile ChannelHandler childHandler;
+    private volatile ChannelHandler childHandler;//处理器
 
     public ServerBootstrap() { }
 
@@ -136,12 +136,12 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         this.childHandler = childHandler;
         return this;
     }
-
+    //init Channel，根据Channel获取ChannelPipeline设置handler
     @Override
     void init(Channel channel) throws Exception {
         final Map<ChannelOption<?>, Object> options = options0();
         synchronized (options) {
-            channel.config().setOptions(options);
+            channel.config().setOptions(options);//给管道设置操作
         }
 
         final Map<AttributeKey<?>, Object> attrs = attrs0();
@@ -153,7 +153,7 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
             }
         }
 
-        ChannelPipeline p = channel.pipeline();
+        ChannelPipeline p = channel.pipeline();//获取一个ChannelPipeline
 
         final EventLoopGroup currentChildGroup = childGroup;
         final ChannelHandler currentChildHandler = childHandler;
@@ -213,6 +213,10 @@ public class ServerBootstrap extends AbstractBootstrap<ServerBootstrap, ServerCh
         return new Entry[size];
     }
 
+    /**
+     * 这个类主要是用来干什么？  必须明白
+     *
+     */
     private static class ServerBootstrapAcceptor extends ChannelInboundHandlerAdapter {
 
         private final EventLoopGroup childGroup;

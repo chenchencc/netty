@@ -38,6 +38,9 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
         implements ChannelHandlerContext, ResourceLeakHint {
 
+    /**
+     * ChannelPipeline中的ChannelHandlerContext形成一个链表
+     */
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(AbstractChannelHandlerContext.class);
     volatile AbstractChannelHandlerContext next;
     volatile AbstractChannelHandlerContext prev;
@@ -138,6 +141,10 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
         return this;
     }
 
+    /**
+     * 对下一个ChannelContext的invokeChannelRegistered方法调用
+     * @param next
+     */
     static void invokeChannelRegistered(final AbstractChannelHandlerContext next) {
         EventExecutor executor = next.executor();
         if (executor.inEventLoop()) {
@@ -480,6 +487,12 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
         return deregister(newPromise());
     }
 
+    /**
+     *
+     * @param localAddress
+     * @param promise
+     * @return
+     */
     @Override
     public ChannelFuture bind(final SocketAddress localAddress, final ChannelPromise promise) {
         if (localAddress == null) {
@@ -734,7 +747,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
 
         return promise;
     }
-
+    //写入数据
     private void invokeWrite(Object msg, ChannelPromise promise) {
         if (invokeHandler()) {
             invokeWrite0(msg, promise);
@@ -814,7 +827,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
             writeAndFlush(msg, promise);
         }
     }
-
+    //向管道中写入数据
     private void write(Object msg, boolean flush, ChannelPromise promise) {
         AbstractChannelHandlerContext next = findContextOutbound();
         final Object m = pipeline.touch(msg, next);
@@ -835,7 +848,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
             safeExecute(executor, task, promise, m);
         }
     }
-
+    //写入数据并刷入
     @Override
     public ChannelFuture writeAndFlush(Object msg) {
         return writeAndFlush(msg, newPromise());
@@ -1049,7 +1062,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
 
         private final Recycler.Handle<AbstractWriteTask> handle;
         private AbstractChannelHandlerContext ctx;
-        private Object msg;
+        private Object msg;//需要被写入的数据
         private ChannelPromise promise;
         private int size;
 
@@ -1132,6 +1145,7 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap
             }
         };
 
+        //WriteAndFlushTask任务
         private static WriteAndFlushTask newInstance(
                 AbstractChannelHandlerContext ctx, Object msg,  ChannelPromise promise) {
             WriteAndFlushTask task = RECYCLER.get();

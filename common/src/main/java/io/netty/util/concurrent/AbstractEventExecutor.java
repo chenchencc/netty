@@ -51,12 +51,13 @@ public abstract class AbstractEventExecutor extends AbstractExecutorService impl
     public EventExecutorGroup parent() {
         return parent;
     }
-
+    //返回AbstractEventExecutor的子类实例
     @Override
     public EventExecutor next() {
         return this;
     }
 
+    //判断是不是EventLoop线程
     @Override
     public boolean inEventLoop() {
         return inEventLoop(Thread.currentThread());

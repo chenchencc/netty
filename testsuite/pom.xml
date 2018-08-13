@@ -121,13 +121,13 @@
 
   <build>
     <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <testSourceDirectory>${project.build.sourceDirectory}</testSourceDirectory>
-          <testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>
-        </configuration>
-      </plugin>
+      <!--<plugin>-->
+        <!--<artifactId>maven-surefire-plugin</artifactId>-->
+        <!--<configuration>-->
+          <!--<testSourceDirectory>${project.build.sourceDirectory}</testSourceDirectory>-->
+          <!--<testClassesDirectory>${project.build.outputDirectory}</testClassesDirectory>-->
+        <!--</configuration>-->
+      <!--</plugin>-->
       <plugin>
         <groupId>me.normanmaurer.maven.autobahntestsuite</groupId>
         <artifactId>autobahntestsuite-maven-plugin</artifactId>

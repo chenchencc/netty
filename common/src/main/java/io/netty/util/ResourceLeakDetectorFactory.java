@@ -56,7 +56,7 @@ public abstract class ResourceLeakDetectorFactory {
 
     /**
      * Returns a new instance of a {@link ResourceLeakDetector} with the given resource class.
-     *
+     * 返回一个给定类的字节码的实例
      * @param resource - the resource class used to initialize the {@link ResourceLeakDetector}
      * @param <T> - the type of the resource class
      * @return - a new instance of {@link ResourceLeakDetector}
@@ -116,6 +116,7 @@ public abstract class ResourceLeakDetectorFactory {
             return null;
         }
 
+        //创建一个ResourceLeakDetector
         @Override
         public <T> ResourceLeakDetector<T> newResourceLeakDetector(
                 Class<T> resource, int samplingInterval, long maxActive) {

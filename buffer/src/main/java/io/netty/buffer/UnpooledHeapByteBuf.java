@@ -29,12 +29,13 @@ import java.nio.channels.ScatteringByteChannel;
 
 /**
  * Big endian Java heap buffer implementation.
+ * 基于非池化的bytebuf
  */
 public class UnpooledHeapByteBuf extends AbstractReferenceCountedByteBuf {
 
-    private final ByteBufAllocator alloc;
-    byte[] array;
-    private ByteBuffer tmpNioBuf;
+    private final ByteBufAllocator alloc;//ByteBufAllocator
+    byte[] array;//字节数组作为缓冲区，用于存储字节数据
+    private ByteBuffer tmpNioBuf;//用来实现Netty ByteBuf 到Nio ByteBuffer的变换
 
     /**
      * Creates a new heap buffer with a newly allocated byte array.

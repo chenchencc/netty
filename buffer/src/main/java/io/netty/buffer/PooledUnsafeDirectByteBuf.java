@@ -47,11 +47,12 @@ final class PooledUnsafeDirectByteBuf extends PooledByteBuf<ByteBuffer> {
     private PooledUnsafeDirectByteBuf(Recycler.Handle<PooledUnsafeDirectByteBuf> recyclerHandle, int maxCapacity) {
         super(recyclerHandle, maxCapacity);
     }
-
+    //创建ByteBuf
     @Override
     void init(PoolChunk<ByteBuffer> chunk, long handle, int offset, int length, int maxLength,
               PoolThreadCache cache) {
         super.init(chunk, handle, offset, length, maxLength, cache);
+        //初始化内存地址
         initMemoryAddress();
     }
 
@@ -61,7 +62,11 @@ final class PooledUnsafeDirectByteBuf extends PooledByteBuf<ByteBuffer> {
         initMemoryAddress();
     }
 
+    /**
+     * 初始化内存地址
+     */
     private void initMemoryAddress() {
+        //内存地址
         memoryAddress = PlatformDependent.directBufferAddress(memory) + offset;
     }
 
@@ -358,7 +363,7 @@ final class PooledUnsafeDirectByteBuf extends PooledByteBuf<ByteBuffer> {
         ensureAccessible();
         return memoryAddress;
     }
-
+    //内存中的内存地址偏移量
     private long addr(int index) {
         return memoryAddress + index;
     }

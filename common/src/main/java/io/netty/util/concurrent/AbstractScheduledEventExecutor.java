@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class AbstractScheduledEventExecutor extends AbstractEventExecutor {
 
+    //
     Queue<ScheduledFutureTask<?>> scheduledTaskQueue;
 
     protected AbstractScheduledEventExecutor() {
@@ -130,6 +131,13 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
         return scheduledTask != null && scheduledTask.deadlineNanos() <= nanoTime();
     }
 
+    /**
+     * 定时任务
+     * @param command
+     * @param delay
+     * @param unit
+     * @return
+     */
     @Override
     public  ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
         ObjectUtil.checkNotNull(command, "command");
